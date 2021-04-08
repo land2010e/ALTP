@@ -1,5 +1,6 @@
 package com.t3h.demoaltp
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.res.AssetManager
 import android.database.sqlite.SQLiteDatabase
@@ -15,6 +16,24 @@ class MrgDatabase {
     constructor(context:Context){
         this.context = context
         copyDB()
+        createTableHightScore()
+    }
+
+    private fun createTableHightScore(){
+        val sql = "CREATE TABLE IF NOT EXISTS hight_score " +
+                "(id INTEGER NOT NULL, " +
+                "name TEXT, " +
+                "level_pass INTEGER, " +
+                "money TEXT, " +
+                "PRIMARY KEY(id AUTOINCREMENT)" +
+                ")"
+        open()
+        //mo ra phien
+        database!!.beginTransaction()
+        database!!.execSQL(sql)
+        database!!.setTransactionSuccessful()
+        //setTransactionSuccessful = commit
+        close()
     }
     private fun copyDB(){
         //quan ly cac file trong asset: AssetManager
@@ -105,5 +124,31 @@ class MrgDatabase {
 
         close()
         return listQuestion
+    }
+
+    fun insertHight(name:String, level:Int, money:String){
+        //ContentValues: la key-value
+        val content = ContentValues()
+        content.put("name", name)
+        content.put("level_pass", level)
+        content.put("money", money)
+        open()
+        database!!.beginTransaction()
+        database!!.insert("hight_score", null, content)
+        database!!.setTransactionSuccessful()
+        close()
+    }
+
+    fun insertUpdate(id:Int, level:Int, money:String){
+        //ContentValues: la key-value
+        val content = ContentValues()
+        content.put("level_pass", level)
+        content.put("money", money)
+        open()
+        database!!.beginTransaction()
+        database!!.update("hight_score", content,
+        "id = "+id.toString(), null)
+        database!!.setTransactionSuccessful()
+        close()
     }
 }
